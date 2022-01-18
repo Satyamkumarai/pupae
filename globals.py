@@ -26,7 +26,9 @@ cv2.createTrackbar('Bh','Threshold',255,255,empty)
 values = []
 tot = 0
 frameNo = 0
-y1,y2,x1,x2 = 235,260,240,273
+
+y1,y2,x1,x2 = 205,260,210,320
+#y1,y2,x1,x2 = 235,260,240,273
 GREEN = (0,255,0)
 thickness = 1
 sm = 0
