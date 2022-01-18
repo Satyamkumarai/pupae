@@ -5,10 +5,27 @@ import time
 import math
 from utils import *
 import threading 
-
+sensor = 21
 import RPi.GPIO as GPIO
 GPIO.cleanup()
 GPIO.setmode(GPIO.BCM)
+GPIO.setup(sensor,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+interval = 3
+start=0
+
+def cb(*args,**kwargs):
+	global start 
+	val = GPIO.input(sensor)
+	if not val:
+		intv = time.time()- start 
+		#print(intv, "time passed")
+		if intv>interval:
+			start=time.time()
+			print("Ouch !",args,kwargs)
+			activate_relay(sm)
+	
+	#	print("Outch!")
+GPIO.add_event_detect(sensor,GPIO.RISING,callback=cb,bouncetime=100)
 
 #GPIO.setup( GPIO.IN)  
 def toggle_relay(ind,pinlist=RELAY_PINS):
@@ -25,7 +42,7 @@ def activate_relay(val=sm):
     global sm
     out_ind,out_class = classify_range(val)
     toggle_relay(out_ind)
-    threading.Timer(DURATION,activate_relay,[sm]).start()
+    #threading.Timer(DURATION,activate_relay,[sm]).start()
 def main():
     global tot,values,frameNo,y1,y2,x1,x2,GREEN,thickness,DURATION,sm
     print("Recording first 10 values")
@@ -45,7 +62,7 @@ def main():
 
     print("Starting the relay ")
 #    init_relay()
-    activate_relay(sm)
+
     while True:
         st= time.time()
         _, frame = cap.read()
@@ -85,3 +102,6 @@ if __name__=='__main__':
         sys.exit(0)
     except:
         sys.exit(0)
+
+
+
