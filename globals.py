@@ -29,3 +29,4 @@ frameNo = 0
 y1,y2,x1,x2 = 235,260,240,273
 GREEN = (0,255,0)
 thickness = 1
+sm = 0

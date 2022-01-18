@@ -4,9 +4,18 @@ import numpy as np
 import time
 import math
 from utils import *
+import threading 
+DURATION  = 1
+import RPi.GPIO as GPIO
+GPIO.setmode(GPIO.BCM)  
+GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
 
+def activate_relay(val=sm):
+    global sm
+    print("Activating Relay","="*100,val)
+    threading.Timer(DURATION,activate_relay,[sm]).start()
 def main():
-    global tot,values,frameNo,y1,y2,x1,x2,GREEN,thickness
+    global tot,values,frameNo,y1,y2,x1,x2,GREEN,thickness,DURATION,sm
     print("Recording first 10 values")
     for i in range(10):
         _, frame = cap.read()
@@ -22,7 +31,8 @@ def main():
         values.append(sm)
         tot+=sm
 
-
+    print("Starting the relay ")
+    activate_relay(sm)
     while True:
         st= time.time()
         _, frame = cap.read()
