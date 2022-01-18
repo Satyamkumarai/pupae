@@ -2,10 +2,10 @@ from globals import *
 
 def classify_range(val,THRESHOLDS =THRESHOLDS,CLASSES=CLASSES):
 	if val==0:
-		return CLASSES[0]
+		return 0,CLASSES[0]
 	for index, th in enumerate(THRESHOLDS):
 		if val<=th:
-			return CLASSES[index-1]
+			return index-1,CLASSES[index-1]
 		
 def getTh(window,low = True):
 	r,g,b = 'Rl','Gl','Bl'

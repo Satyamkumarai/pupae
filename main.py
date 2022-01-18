@@ -5,14 +5,24 @@ import time
 import math
 from utils import *
 import threading 
-DURATION  = 1
+
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)  
-GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
-
+#GPIO.setup( GPIO.IN)  
+def toggle_relay(ind,pinlist=RELAY_PINS):
+    pin = pinlist[ind]
+    for p in RELAY_PINS:
+        if p!=pin:
+            GPIO.setup(p,GPIO.IN)
+    print("Turn on ",pin)
+    GPIO.setup(pin,GPIO.OUT)
+    #time.sleep(1)
+    #print("turn off",pin)
+    #GPIO.setup(pin,GPIO.IN)
 def activate_relay(val=sm):
     global sm
-    print("Activating Relay","="*100,val)
+    out_ind,out_class = classify_range(val)
+    toggle_relay(out_ind)
     threading.Timer(DURATION,activate_relay,[sm]).start()
 def main():
     global tot,values,frameNo,y1,y2,x1,x2,GREEN,thickness,DURATION,sm
@@ -32,6 +42,7 @@ def main():
         tot+=sm
 
     print("Starting the relay ")
+#    init_relay()
     activate_relay(sm)
     while True:
         st= time.time()
@@ -50,8 +61,8 @@ def main():
         tot-=first_val
         tot+=sm
         values.append(sm)
-
-        print(f"Total=\t{sm}\tGender:{classify_range(sm)}",end = " ")
+        out_ind,out_class = classify_range(sm)
+        print(f"Total=\t{sm}\tGender:{out_class}",end = " ")
         
         #cv2.imshow("Frame", frame)
         cv2.imshow("red image", RED) 
@@ -66,4 +77,9 @@ def main():
     cv2.destroyAllWindows()
 
 if __name__=='__main__':
-    main()
+    import sys
+    try:
+        main()
+        sys.exit(0)
+    except:
+        sys.exit(0)
