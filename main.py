@@ -7,7 +7,9 @@ from utils import *
 import threading 
 
 import RPi.GPIO as GPIO
-GPIO.setmode(GPIO.BCM)  
+GPIO.cleanup()
+GPIO.setmode(GPIO.BCM)
+
 #GPIO.setup( GPIO.IN)  
 def toggle_relay(ind,pinlist=RELAY_PINS):
     pin = pinlist[ind]
