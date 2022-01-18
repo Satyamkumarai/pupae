@@ -1,11 +1,14 @@
+#!/usr/bin/python3
 import RPi.GPIO as GPIO
 from time import sleep
 import time
+
 start = 0
 GPIO.setmode(GPIO.BCM)
 sensor = 21
 GPIO.setup(sensor,GPIO.IN,pull_up_down=GPIO.PUD_UP)
-interval = 5
+interval = 3
+print(f"Reading from pin {sensor}")
 def cb(*args,**kwargs):
 	global start	
 	val = GPIO.input(sensor)
@@ -14,10 +17,10 @@ def cb(*args,**kwargs):
 		#print(intv, "time passed")
 		if intv>interval:
 			start=time.time()
-			print("Ouch !",args,kwargs)
+			print("Yay !",args,kwargs)
 	
 	#	print("Outch!")
-GPIO.add_event_detect(sensor,GPIO.RISING,callback=cb,bouncetime=100)
+GPIO.add_event_detect(sensor,GPIO.FALLING,callback=cb,bouncetime=100)
 #GPIO.wait_for_edge(sensor,GPIO.FALLING)
 while 1 :
 	sleep(12)
