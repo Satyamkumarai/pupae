@@ -1,0 +1,6 @@
+#Continously record values pushing it to and array
+#As soon as trigger occurs set a flag to:
+	1. take the sum and divide by avg
+	2. Display and trigger relavant relays
+	3. reset the sum and array
+
