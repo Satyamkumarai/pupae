@@ -2,8 +2,9 @@
 import RPi.GPIO as GPIO
 import time
 import sys
+import os 
 if len(sys.argv) < 2:
-	print("usage : \n ntest.py <pin>")
+	print(f"usage : \n {os.path.basename(__file__)} <pin>")
 	sys.exit(0)
 
 relay = int(sys.argv[1])

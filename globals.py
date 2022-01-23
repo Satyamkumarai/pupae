@@ -15,14 +15,14 @@ CLASSES = ['MALE','UNSEGREGATED','FEMALE']
 def empty(pos):
 	pass
 
-
-cv2.namedWindow(window)
-cv2.createTrackbar('Rl','Threshold',0,255,empty)
-cv2.createTrackbar('Gl','Threshold',35,255,empty)
-cv2.createTrackbar('Bl','Threshold',70,255,empty)
-cv2.createTrackbar('Rh','Threshold',40,255,empty)
-cv2.createTrackbar('Gh','Threshold',255,255,empty)
-cv2.createTrackbar('Bh','Threshold',255,255,empty)
+def create_color_threshold_window():
+	cv2.namedWindow(window)
+	cv2.createTrackbar('Rl','Threshold',0,255,empty)
+	cv2.createTrackbar('Gl','Threshold',35,255,empty)
+	cv2.createTrackbar('Bl','Threshold',70,255,empty)
+	cv2.createTrackbar('Rh','Threshold',40,255,empty)
+	cv2.createTrackbar('Gh','Threshold',255,255,empty)
+	cv2.createTrackbar('Bh','Threshold',255,255,empty)
 values = []
 tot = 0
 frameNo = 0

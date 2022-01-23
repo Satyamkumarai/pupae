@@ -86,8 +86,10 @@ def activate_relay(val=sm):
 
 
 def main():
+    print("Starting..")
+    create_color_threshold_window()
     global tot,values,frameNo,y1,y2,x1,x2,GREEN,thickness,DURATION,sm,RECORD_RESET
-    print("main")
+    
     while 1:
         # first capture the frame and get the sum
         _, frame = cap.read()
