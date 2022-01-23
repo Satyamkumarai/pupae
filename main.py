@@ -16,6 +16,14 @@ start=0
 DELAY_FOR_SYNC = 2.25
 TRIG_FLAG =0 # not yet triggered
 
+# time after trigger to stop recording 
+UPPER_T = 2.0
+# time after triger to start recording 
+LOWER_T = 1.1
+
+start_rec_time  = 0
+
+
 
 RECORD_RESET = False
 
@@ -34,15 +42,19 @@ def trig_relay(pin= TRIG_RELAY_PIN):
 #+++++++++++++++++++++++++++++
 
 
+def toggle_record_reset():
+	global RECORD_RESET
+	print(f"Resetting ",RECORD_RESET)
+	RECORD_RESET = True
 
-
-# the Call back for the hardware interrupt 
+# the Call back for the hardware interrupt
 def cb(*args,**kwargs):
-	global start,RECORD_RESET , sm 
+	global start,RECORD_RESET , sm
 	val = GPIO.input(sensor)
+	#print("TRIO")
 	# only trigger on low value
 	if not val:
-		intv = time.time()- start 
+		intv = time.time()- start
 		#print(intv, "time passed")
 		# and if the "bounce period " has  exceeded
 		if intv>interval:
@@ -51,7 +63,13 @@ def cb(*args,**kwargs):
 			# trigger a relay
 			trig_relay()
 			# set reset of record values
+			# delay to compensate for the sensor offsett
+			#time.sleep(LOWER_T)
+			#print("start Rec")
 			RECORD_RESET = True
+			#time.sleep(UPPER_T -LOWER_T)
+			#print("Stop Rec")
+			#RECORD_RESET = False
 			#print(f"Record Reset ? :{RECORD_RESET}")
 			#print("Exit from call back ")
 			# run the main function
@@ -60,7 +78,7 @@ def cb(*args,**kwargs):
 
 
 # event to trigger the callback when the IR sensor gets triggered
-GPIO.add_event_detect(sensor,GPIO.RISING,callback=cb,bouncetime=300)
+GPIO.add_event_detect(sensor,GPIO.FALLING,callback=cb,bouncetime=300)
 
 
 # function used to toggle the correspinding relay based on classification (ind is the classification index of CLASSES)
@@ -81,8 +99,8 @@ def activate_relay(val=sm):
 
 
 
-# sm holds the total sm values till current frame ( between two triggers )
-# frame number records the number of values recored ( between two triggers )
+# sm           : total sm values till current frame ( between two triggers )
+# frame number : number of values recored ( between two triggers )
 
 
 def main():
@@ -105,7 +123,6 @@ def main():
         image = cv2.inRange(hsr_frame,low_R,high_r)
         # RED is the actual transformed image
         RED = cv2.bitwise_and(cropped, cropped, mask=image)
-        
         # show the actual frames
         cv2.imshow("red image", RED) 
         rectImage= cv2.rectangle(frame,(x1,y1),(x2,y2),GREEN, thickness)
@@ -113,14 +130,11 @@ def main():
         key = cv2.waitKey(1)
         if key == 27:
             break
-        
-        
         sm += np.sum(RED)
         # the IR sensor has been triggerd
         if RECORD_RESET:
             # calc sum
             avg = sm / frameNo
-            
             #print the average values:
             print(f"Average val:{avg}, ",classify_range(avg))
             # classify Pupae 
@@ -132,33 +146,6 @@ def main():
         else :
             continue
 
-# while True:
-#         
-#         
-#         
-#         
-#         
-#         
-#         
-#         st= time.time()
-#         _, frame = cap.read()
-#         #cropping the frame
-#         cropped = frame[y1:y2,x1:x2]
-#         hsr_frame = cv2.cvtColor(cropped, cv2.COLOR_BGR2HSV)
-#         # setting the Threshold values
-#         low_R = getTh(window)
-#         high_r = getTh(window,False)
-#         image = cv2.inRange(hsr_frame,low_R,high_r)
-#         RED = cv2.bitwise_and(cropped, cropped, mask=image)
-#         sm = np.sum(RED)/10
-#         first_val = values.pop(0)
-#         tot-=first_val
-#         tot+=sm
-#         values.append(sm)
-#         out_ind,out_class = classify_range(sm)
-#         print(f"Total=\t{sm}\tGender:{out_class}",end = " ")
-#         #cv2.imshow("Frame", frame)
-#         print(f"\t-\t{time.time()-st} s")   
     
     
 if __name__=='__main__':

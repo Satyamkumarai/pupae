@@ -7,7 +7,7 @@ import math
 cap = cv2.VideoCapture(-1)
 
 window = 'Threshold'
-THRESHOLDS = [0,1000,10000,math.inf]
+THRESHOLDS = [0,8000,8005,math.inf]
 CLASSES = ['MALE','UNSEGREGATED','FEMALE']
 #THRESHOLD_MALE = 20000//2
 

@@ -7,7 +7,7 @@ start = 0
 GPIO.setmode(GPIO.BCM)
 sensor = 21
 GPIO.setup(sensor,GPIO.IN,pull_up_down=GPIO.PUD_UP)
-interval = 3
+interval = 2
 print(f"Reading from pin {sensor}")
 def cb(*args,**kwargs):
 	global start	
