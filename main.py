@@ -25,7 +25,7 @@ RELAY_WAIT_DURATION = 0.1
 TRIG_RELAY_PIN = 20
 GPIO.setup(TRIG_RELAY_PIN , GPIO.IN)
 def trig_relay(pin= TRIG_RELAY_PIN):
-    print("Triggering Relay!")
+    #print("Triggering Relay!")
     GPIO.setup(TRIG_RELAY_PIN , GPIO.OUT)
     sleep(RELAY_WAIT_DURATION)
     GPIO.setup(TRIG_RELAY_PIN , GPIO.IN)
@@ -43,17 +43,17 @@ def cb(*args,**kwargs):
 	# only trigger on low value
 	if not val:
 		intv = time.time()- start 
-		print(intv, "time passed")
+		#print(intv, "time passed")
 		# and if the "bounce period " has  exceeded
 		if intv>interval:
 			start=time.time()
-			print("Triggered at Value: ",sm)
+			#print("Triggered at Value: ",sm)
 			# trigger a relay
 			trig_relay()
 			# set reset of record values
 			RECORD_RESET = True
-			print(f"Record Reset ? :{RECORD_RESET}")
-			print("Exit from call back ")
+			#print(f"Record Reset ? :{RECORD_RESET}")
+			#print("Exit from call back ")
 			# run the main function
 # 			activate_relay(sm)
 
@@ -69,7 +69,7 @@ def toggle_relay(ind,pinlist=RELAY_PINS):
     for p in RELAY_PINS:
         if p!=pin:
             GPIO.setup(p,GPIO.IN)
-    print("Turn on ",pin , "and turn others off")
+    #print("Turn on ",pin , "and turn others off")
     GPIO.setup(pin,GPIO.OUT)
 
 #function used to activate one of the three relays based on value (sm)
@@ -91,7 +91,8 @@ def main():
     while 1:
         # first capture the frame and get the sum
         _, frame = cap.read()
-        print(f"frame:{frameNo}, sm:{sm} , startof newframe: {RECORD_RESET}")
+        #print(f"frame:{frameNo}, sm:{sm} ")
+#, startof newframe: {RECORD_RESET}
         # read a new frame
         frameNo+=1
         # cropping and image transformations
@@ -119,12 +120,12 @@ def main():
             avg = sm / frameNo
             
             #print the average values:
-            print(f"Average val:{avg}")
+            print(f"Average val:{avg}, ",classify_range(avg))
             # classify Pupae 
             activate_relay(val=avg) 
             #reset calc
             sm,frameNo=0,0
-            print(f"Setting Record reset {RECORD_RESET} to false")
+            #print(f"Setting Record reset {RECORD_RESET} to false")
             RECORD_RESET=False
         else :
             continue
