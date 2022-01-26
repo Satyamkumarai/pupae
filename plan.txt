@@ -1,6 +1,30 @@
-#Continously record values pushing it to and array
+#Continously record values and add it to the total sum  while the record timer has not expired 
 #As soon as trigger occurs set a flag to:
-	1. take the sum and divide by avg
+	1. reset the timer
+	2. 
+	1. take the sum and divide by a
 	2. Display and trigger relavant relays
 	3. reset the sum and array
 
+
+
+Variables 
+	
+	RECORDING : Boolean to say if the record has started
+	start_rec_time : start value since start of recording
+	rec_interval_low : the duration after which recording to be started
+	rec_intervel_high : the duration after which the recording stops
+	
+
+# As soon as the Sensor Triggers :
+	1. set RECORDING to True after rec_interval_low ( using a new thread ) 
+	2. restart the recording timer( start_rec_time ) 
+# if recording :
+	# if timer has not yet expired  time_passed <= rec_interval_high) : 
+		1. add the values
+	# if timer has expired (time_passed > rec_interval_high):
+		1. calculate the average (sm/frameNo): 
+		2. Classify pupae
+		3. reset the sm and frameNo
+		4. set RECORDING to False
+ 

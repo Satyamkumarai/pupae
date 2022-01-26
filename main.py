@@ -11,21 +11,23 @@ sensor = 21
 GPIO.cleanup()
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(sensor,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+# sensor Desensitize period
 interval = 2
+# start timer for proximity sensor
 start=0
+
 DELAY_FOR_SYNC = 2.25
-TRIG_FLAG =0 # not yet triggered
+
+# start timer for recording
+start_rec_time = 0
 
 # time after trigger to stop recording 
-UPPER_T = 2.0
+rec_interval_high = 2.0
 # time after triger to start recording 
-LOWER_T = 1.1
+rec_interval_low = 1.0
 
-start_rec_time  = 0
-
-
-
-RECORD_RESET = False
+# Is it recording 
+RECORDING = False
 
 #+++++++++++++++++++++++++++++++++++++++++
 # Extra trigger for the IR sensor :
@@ -39,17 +41,11 @@ def trig_relay(pin= TRIG_RELAY_PIN):
     GPIO.setup(TRIG_RELAY_PIN , GPIO.IN)
     sleep(RELAY_WAIT_DURATION)
     
-#+++++++++++++++++++++++++++++
-
-
-def toggle_record_reset():
-	global RECORD_RESET
-	print(f"Resetting ",RECORD_RESET)
-	RECORD_RESET = True
+#++++++++++++++++++++++++++++
 
 # the Call back for the hardware interrupt
 def cb(*args,**kwargs):
-	global start,RECORD_RESET , sm
+	global start,RECORDING , sm , start_rec_time
 	val = GPIO.input(sensor)
 	#print("TRIO")
 	# only trigger on low value
@@ -63,17 +59,9 @@ def cb(*args,**kwargs):
 			# trigger a relay
 			trig_relay()
 			# set reset of record values
-			# delay to compensate for the sensor offsett
-			#time.sleep(LOWER_T)
 			#print("start Rec")
-			RECORD_RESET = True
-			#time.sleep(UPPER_T -LOWER_T)
-			#print("Stop Rec")
-			#RECORD_RESET = False
-			#print(f"Record Reset ? :{RECORD_RESET}")
-			#print("Exit from call back ")
-			# run the main function
-# 			activate_relay(sm)
+			RECORDING = True
+
 
 
 
@@ -106,8 +94,7 @@ def activate_relay(val=sm):
 def main():
     print("Starting..")
     create_color_threshold_window()
-    global tot,values,frameNo,y1,y2,x1,x2,GREEN,thickness,DURATION,sm,RECORD_RESET
-    
+    global tot,values,frameNo,y1,y2,x1,x2,GREEN,thickness,DURATION,sm,RECORD_RESET, start_rec_t
     while 1:
         # first capture the frame and get the sum
         _, frame = cap.read()
@@ -130,9 +117,12 @@ def main():
         key = cv2.waitKey(1)
         if key == 27:
             break
-        sm += np.sum(RED)
-        # the IR sensor has been triggerd
-        if RECORD_RESET:
+        # Recording start
+        if RECORDING:
+
+
+	    # reset the timer
+	    start_rec_t = time.time()
             # calc sum
             avg = sm / frameNo
             #print the average values:
@@ -142,7 +132,7 @@ def main():
             #reset calc
             sm,frameNo=0,0
             #print(f"Setting Record reset {RECORD_RESET} to false")
-            RECORD_RESET=False
+            RECORDING=False
         else :
             continue
 
