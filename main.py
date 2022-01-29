@@ -91,9 +91,9 @@ def toggle_relay(ind,pinlist=RELAY_PINS):
     GPIO.setup(pin,GPIO.OUT)
 
 #function used to activate one of the three relays based on value (sm)
-def activate_relay(val=sm):
-    global sm
-    out_ind,out_class = classify_range(val)
+def activate_relay(val=sm,trig_empty=True):
+    global sm,empty_sm
+    out_ind,out_class = classify_range(val,empty_val=empty_val if trig_empty else 0)
     toggle_relay(out_ind)
 
 
@@ -106,8 +106,9 @@ def activate_relay(val=sm):
 def main():
     print("Starting..")
     create_color_threshold_window()
-    global tot,values,frameNo,y1,y2,x1,x2,GREEN,thickness,DURATION,sm,RECORD_RESET
-    
+    global tot,values,frameNo,y1,y2,x1,x2,GREEN,thickness,DURATION,sm,RECORD_RESET,empty_sm
+    LE = np.array([100,0,250])
+    HE = np.array([255,255,255])
     while 1:
         # first capture the frame and get the sum
         _, frame = cap.read()
@@ -123,24 +124,29 @@ def main():
         image = cv2.inRange(hsr_frame,low_R,high_r)
         # RED is the actual transformed image
         RED = cv2.bitwise_and(cropped, cropped, mask=image)
-        # show the actual frames
-        cv2.imshow("red image", RED) 
+        #show the actual frames
+        cv2.imshow("red image", RED)
+        empty_image = cv2.inRange(hsr_frame,LE,HE)
+        empty_frame = cv2.bitwise_and(cropped,cropped,mask=empty_image)
+        cv2.imshow("empty frame" , empty_frame) 
         rectImage= cv2.rectangle(frame,(x1,y1),(x2,y2),GREEN, thickness)
         cv2.imshow("Frame Rect",rectImage)
         key = cv2.waitKey(1)
         if key == 27:
             break
         sm += np.sum(RED)
+        empty_sm +=np.sum(empty_frame)
+        print("works")
         # the IR sensor has been triggerd
         if RECORD_RESET:
             # calc sum
             avg = sm / frameNo
             #print the average values:
-            print(f"Average val:{avg}, ",classify_range(avg))
-            # classify Pupae 
-            activate_relay(val=avg) 
+            print(f"Average val:{avg}, ",classify_range(avg,empty_val=empty_sm/frameNo)
+            # classify Pupae and trigger relay
+            activate_relay(val=avg,trig_empty=False) 
             #reset calc
-            sm,frameNo=0,0
+            sm,empty_sm,frameNo=0,0,0
             #print(f"Setting Record reset {RECORD_RESET} to false")
             RECORD_RESET=False
         else :

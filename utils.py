@@ -1,8 +1,10 @@
 from globals import *
 
 # based on threshold values return the index and the class of the PUPAE
-def classify_range(val,THRESHOLDS =THRESHOLDS,CLASSES=CLASSES):
+def classify_range(val,THRESHOLDS =THRESHOLDS,CLASSES=CLASSES,empty_val=0):
 	#print(f"Classifying the pupae for avg : {val}")
+	if empty_val>= EMPTY_THRESHOLD:
+		return 0,CLASSES[3]
 	if val==0:
 		return 0,CLASSES[0]
 	for index, th in enumerate(THRESHOLDS):
